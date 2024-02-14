@@ -1,0 +1,8 @@
+bin/
+target/
+.bsp
+**/.bloop/
+.metals/
+**/metals.sbt
+.scala-build
+.vscode
