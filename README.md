@@ -8,5 +8,14 @@
 
 # Build
 
+`source package.sh`
+
 # Contribute
 
+Contributions are welcome! If you commit to this repo you agree that the owner of this repo can use your code according to the license.
+
+# Publish
+
+* Bump the version in `package.sh` and run the script.
+
+* Create a release and upload the jar to the release section of this GitHub repo.
