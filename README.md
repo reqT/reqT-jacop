@@ -16,7 +16,7 @@
 //> using dep "reqt-lang:reqt-lang:4.2.0,url=https://github.com/reqT/reqT-lang/releases/download/4.2.0/reqt-lang_3-4.2.0.jar"
 //> using dep "reqt-jacop:reqt-jacop:1.1.0,url=https://github.com/reqT/reqT-jacop/releases/download/v1.1.0/reqt-jacop_3-1.1.0.jar"
 ```
-* With both reqT-lang and reqT-jacop on your class path you will get access to constraint satisfaction problem (csp) solving using extension methods such as `satisfy`, `findAll`, `maximise` etc., as exported [here](https://github.com/reqT/reqT-jacop/blob/main/src/main/scala/reqt-jacop.scala#L3).
+* With reqT-lang, org.jacop and reqT-jacop on your class path you will get access to constraint satisfaction problem (csp) solving using extension methods such as `satisfy`, `findAll`, `maximise` etc., as exported [here](https://github.com/reqT/reqT-jacop/blob/main/src/main/scala/reqt-jacop.scala#L3).
 
 * Start REPL with `scala-cli repl .` 
 
