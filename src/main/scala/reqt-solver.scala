@@ -1,7 +1,5 @@
 package reqt
 
-import constraints.*
-
 /** An interface to a constraint solver */
 object solver:  
   // TODO: generalize/abstract this and move to reqT-lang ??? 

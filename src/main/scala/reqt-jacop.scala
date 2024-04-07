@@ -1,8 +1,9 @@
 package reqt
 
+export jacop.{solve, satisfy, countAll, findAll, maximize, minimize}
+
 /** An interface to the JaCoP solver http://www.jacop.eu  */
 object jacop:  
-  import constraints.*
   import solver.*
   import org.jacop.{constraints => jcon, core => jcore, search => jsearch}
 

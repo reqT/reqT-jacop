@@ -1,6 +1,6 @@
 package reqt
 
-import constraints.*
+import csp.*
 
 class TestConstr extends munit.FunSuite:
 
