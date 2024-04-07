@@ -2,7 +2,7 @@ package reqt
 
 import constraints.*, jacop.*
 
-class TestConstr extends munit.FunSuite:
+class TestJacopSolver extends munit.FunSuite:
   test("IntVar relation constraints satisfy"):
     val x = IntVar("x")
     val cs = Seq(x === 42)
