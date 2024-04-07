@@ -6,7 +6,7 @@
 
 # Use
 
-* Install [scala-cli]()
+* Install [scala-cli](https://scala-cli.virtuslab.org/install)
 
 * Include this in a file called `project.scala`:
 
