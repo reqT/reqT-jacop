@@ -1,6 +1,6 @@
 # reqT-jacop
 
-* reqT-jacop is a [Scala](https://www.scala-lang.org/) interface to the [JaCoP](https://github.com/radsz/jacop) library for solving integer constraint satisfaction problems (csp). 
+* reqT-jacop is a [Scala](https://www.scala-lang.org/) interface to the [JaCoP](https://github.com/radsz/jacop) library for solving constraint satisfaction problems (csp). 
 
 * reqT-jacop depends on [reqT-lang](https://github.com/reqT/reqT-lang) and [org.jacop:jacop](https://search.maven.org/artifact/org.jacop/jacop/4.10.0/jar?eh=)
 
