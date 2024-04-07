@@ -46,7 +46,9 @@ val n: Int = 820
 
 # Contribute
 
-Contributions are welcome! If you commit to this repo you agree that the owner of this repo can use your code according to the license.
+* Contributions are welcome! Contact the current maintainer: bjorn.regnell@cs.lth.se  
+
+* NOTE: If you make a contribution to this repo you agree that the owner of this repo can use your code according to the license of this repo.
 
 # Publish
 
