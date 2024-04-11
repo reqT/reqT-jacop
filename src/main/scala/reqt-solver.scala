@@ -5,14 +5,18 @@ object solver:
   // TODO: generalize/abstract this and move to reqT-lang ??? 
   //       consider enabling swap to https://github.com/chocoteam/choco-solver
 
+  def noWarn(c: Conclusion): Unit = ()
+  def doWarn(c: Conclusion): Unit = println(Console.RED + s"WARNING: $c" + Console.RESET)
+
+
   case class SearchConfig(
     valueSelection: ValueSelection = ValueSelection.IndomainRandom,
     variableSelection: VariableSelection = InputOrder,
     timeOutOption: Option[Long] = None,
     solutionLimitOption: Option[Int] = None,
     assignOption: Option[Seq[Var]] = None,
-    defaultInterval: Range = -1000 to 1000,
-    warn: String => Unit = (s: String) => println("WARNING: " + s),
+    defaultInterval: Range = -1000 to 1000,    // a conservative range to save memory and time
+    warnUnsolved: Conclusion => Unit = doWarn, // if you don't want warning use noWarn
     verbose: Boolean = false,
     debug: Boolean = false,
   )

@@ -10,7 +10,7 @@ object jacop:
   extension (cs: Seq[Constr]) 
     def solve(st: SearchType)(using cfg: SearchConfig): Result = 
       val result = new JacopSolver(cs, st, cfg).solve
-      if result.conclusion != SolutionFound then cfg.warn(result.conclusion.toString)
+      if result.conclusion != SolutionFound then cfg.warnUnsolved(result.conclusion)
       result
     
     def satisfy(using cfg: SearchConfig): Result             = solve(SolutionSearch.Satisfy)
