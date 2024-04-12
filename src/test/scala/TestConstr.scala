@@ -82,36 +82,43 @@ class TestConstr extends munit.FunSuite:
         Prio(1),
         Feature("1") has Benefit(4),
         Feature("2") has Benefit(2),
-        Feature("3") has Benefit(1)),
+        Feature("3") has Benefit(1),
+      ),
       Stakeholder("Y") has (
         Prio(2),
         Feature("1") has Benefit(2),
         Feature("2") has Benefit(1),
-        Feature("3") has Benefit(1)),
+        Feature("3") has Benefit(1),
+      ),
       Release("A") precedes Release("B"),
       Resource("dev") has (
         Feature("1") has Cost(10),
         Feature("2") has Cost(70),
         Feature("3") has Cost(40),
         Release("A") has Capacity(100),
-        Release("B") has Capacity(100)),
+        Release("B") has Capacity(100),
+      ),
       Resource("test") has (
         Feature("1") has Cost(40),
         Feature("2") has Cost(10),
         Feature("3") has Cost(70),
         Release("A") has Capacity(100),
-        Release("B") has Capacity(100)),
-      Feature("3") precedes Feature("1")) 
+        Release("B") has Capacity(100),
+      ),
+      Feature("3") precedes Feature("1")
+    ) 
 
+    def constraints(m: Model): Seq[Constr] =  
+        
       val requiredEntityTypes = List(Release, Feature, Stakeholder, Resource)
       val isRequiredEntityTypes = requiredEntityTypes.toSet
-
+  
       def missing(m: Model): Seq[EntType] = m.ents.map(_.et).filterNot(isRequiredEntityTypes)  // Should be e.t in next version of reqT-lang
       
       def isValid(m: Model): Boolean = missing(m).isEmpty
-
-      def constraints(m: Model): Model = if !isValid(m) then Model() else 
-        
+      
+      if !isValid(m) then Seq() else
+  
         val stakeholders = m.ents.filter(_.et == Stakeholder)
         val features =     m.ents.filter(_.et == Feature)
         val releases =     m.ents.filter(_.et == Release)
@@ -120,40 +127,76 @@ class TestConstr extends munit.FunSuite:
         val featureOrder: Seq[Constr] = forAll(features) { f => Var(f.has/Order).in(1 to releases.size) }
         val releaseOrder: Seq[Constr] = forAll(releases) { r => Var(r.has/Order).in(1 to releases.size) }
 
-        val weightedBenefit = forAll(stakeholders, features): (s, f) => 
+        val weightedBenefit: Seq[Constr] = forAll(stakeholders, features): (s, f) => 
           Var(f.has/s.has/Benefit) ===  (Var(s.has/f.has/Benefit) * Var(s.has/Prio))
         
-        val featureBenefitSum = forAll(features): f => 
+        val featureBenefitSum: Seq[Constr] = forAll(features): f => 
           Var(f.has/Benefit) === sumForAll(stakeholders)(s => Var(f.has/s.has/Benefit)) 
 
-        val featureBenefitPerRelease = forAll(releases, features) { (r, f) =>
-          IfThenElse(Var(f/Order) === Var(r/Order),
-            Var(r/f/Benefit) === Var(f/Benefit),
-            Var(r/f/Benefit) === 0) }
+        val featureBenefitPerRelease: Seq[Constr] = forAll(releases, features) { (r, f) =>
+          IfThenElse(Var(f.has/Order) === Var(r.has/Order),
+            Var(r.has/f.has/Benefit) === Var(f.has/Benefit),
+            Var(r.has/f.has/Benefit) === 0) }
         
-        val benefitPerRelease = forAll(releases) { r =>
-          Var(r/Benefit) === sumForAll(features)(f => Var(r/f/Benefit))  }    
+        val benefitPerRelease: Seq[Constr] = forAll(releases): r =>
+          Var(r.has/Benefit) === sumForAll(features)(f => Var(r.has/f.has/Benefit))
         
-        val featureCostPerReleasePerResource = forAll(releases,features, resources) { (r, f, res) =>
-          IfThenElse(Var(f/Order) === Var(r/Order),
-            Var(r/res/f/Cost) === Var(res/f/Cost),
-            Var(r/res/f/Cost) === 0) }
+        val featureCostPerReleasePerResource: Seq[Constr] = 
+          forAll(releases,features, resources): (r, f, res) =>
+            IfThenElse(Var(f.has/Order) === Var(r.has/Order),
+              Var(r.has/res.has/f.has/Cost) === Var(res.has/f.has/Cost),
+              Var(r.has/res.has/f.has/Cost) === 0)
         
-        val resourceCostPerRelease = forAll(releases,resources) { (r, res) =>
-          Var(r/res/Cost) === sumForAll(features)(f => Var(r/res/f/Cost))  }
+        val resourceCostPerRelease: Seq[Constr] = forAll(releases,resources): (r, res) =>
+          Var(r.has/res.has/Cost) === sumForAll(features)(f => Var(r.has/res.has/f.has/Cost))
         
-        val featureCostPerRelease = forAll(releases,features) { (r, f) =>
-          Var(r/f/Cost) === sumForAll(resources)(res => Var(r/res/f/Cost))  }
+        val featureCostPerRelease: Seq[Constr] = forAll(releases,features): (r, f) =>
+          Var(r.has/f.has/Cost) === sumForAll(resources)(res => Var(r.has/res.has/f.has/Cost)) 
         
-        val costPerRelease = forAll(releases) { r =>
-          Var(r/Cost) === sumForAll(features)(f => Var(r/f/Cost))  }
+        val costPerRelease: Seq[Constr] = forAll(releases): r =>
+          Var(r.has/Cost) === sumForAll(features)(f => Var(r.has/f.has/Cost))
       
-        val costLimitPerResource = forAll(releases, resources) { (r, res) =>
+        val costLimitPerResource: Seq[Constr] = forAll(releases, resources): (r, res) =>
           Var(r.has/res.has/Cost) <= Var(res.has/r.has/Capacity)
-        }
         
-        val totalCostPerRelease = forAll(releases) { r =>
-          Var(r/Cost) === sumForAll(resources)(res => Var(r/res/Cost)) }    
+        val totalCostPerRelease: Seq[Constr] = forAll(releases): r =>
+          Var(r.has/Cost) === sumForAll(resources)(res => Var(r.has/res.has/Cost))
+        
+        def rels(m: Model): Vector[Rel] = m.elems.flatMap:
+          case _: Node => Vector() 
+          case r@Rel(_, _, m) => Vector(r) ++ rels(m)
+        
+        val rs = rels(simple)
+        
+        val precedences = rs.collect:
+          case Rel(e1, Precedes, Model(Vector(e2: Ent))) => Var(e1.has/Order) < Var(e2.has/Order) 
+        
+        val exclusions = rs.collect:
+          case Rel(e1, Excludes, Model(Vector(e2: Ent))) => Var(e1.has/Order) =/= Var(e2.has/Order) 
+          
+        val couplings = rs.collect:
+          case Rel(e1, Requires, Model(Vector(e2: Ent))) => Var(e1.has/Order) === Var(e2.has/Order)
 
-        ???
+        Seq(featureOrder, releaseOrder, weightedBenefit, featureBenefitSum, featureBenefitPerRelease, benefitPerRelease, featureCostPerReleasePerResource, resourceCostPerRelease, featureCostPerRelease, costPerRelease, costLimitPerResource, totalCostPerRelease, precedences, exclusions, couplings).flatten
+
+    end constraints
+
+    val problem = constraints(simple)
+
+    //problem.foreach(c => println(s"  Constr:\n    $c"))
+    println(s"    problem has ${problem.length} constraints")
+
+    //val solution = problem.maximize(Var(Release("A")/Benefit))
+    val solution = problem.maximize(Var(Release("A").has/Benefit))
+
+    val solMap = solution.lastSolution
+
+    val pathValues = 
+      solMap.map{case (v, x) => v.id.asInstanceOf[AttrTypePath[Int]] -> x}
+
+    //println(s"    solution.conclusion: ${solution.conclusion}")
+
+    println(s"    pathValues:\n")
+    pathValues.foreach((v,x) => println(s"  ${v} \t\t=== $x"))
+    ???
   
