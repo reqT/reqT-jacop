@@ -113,19 +113,21 @@ class TestConstr extends munit.FunSuite:
       val requiredEntityTypes = List(Release, Feature, Stakeholder, Resource)
       val isRequiredEntityTypes = requiredEntityTypes.toSet
   
-      def missing(m: Model): Seq[EntType] = m.ents.map(_.et).filterNot(isRequiredEntityTypes)  // Should be e.t in next version of reqT-lang
+      def missing(m: Model): Seq[EntType] = m.ents.map(_.t).filterNot(isRequiredEntityTypes)  // Should be e.t in next version of reqT-lang
       
       def isValid(m: Model): Boolean = missing(m).isEmpty
       
       if !isValid(m) then Seq() else
   
-        val stakeholders = m.ents.filter(_.et == Stakeholder)
-        val features =     m.ents.filter(_.et == Feature)
-        val releases =     m.ents.filter(_.et == Release)
-        val resources =    m.ents.filter(_.et == Resource)
+        val stakeholders = m.ents.filter(_.t == Stakeholder).distinct
+        val features =     m.ents.filter(_.t == Feature).distinct
+        val releases =     m.ents.filter(_.t == Release).distinct
+        val resources =    m.ents.filter(_.t == Resource).distinct
 
         val featureOrder: Seq[Constr] = forAll(features) { f => Var(f.has/Order).in(1 to releases.size) }
         val releaseOrder: Seq[Constr] = forAll(releases) { r => Var(r.has/Order).in(1 to releases.size) }
+
+        println(releases)
 
         val weightedBenefit: Seq[Constr] = forAll(stakeholders, features): (s, f) => 
           Var(f.has/s.has/Benefit) ===  (Var(s.has/f.has/Benefit) * Var(s.has/Prio))
@@ -166,7 +168,7 @@ class TestConstr extends munit.FunSuite:
           case _: Node => Vector() 
           case r@Rel(_, _, m) => Vector(r) ++ rels(m)
         
-        val rs = rels(simple)
+        val rs = simple.rels
         
         val precedences = rs.collect:
           case Rel(e1, Precedes, Model(Vector(e2: Ent))) => Var(e1.has/Order) < Var(e2.has/Order) 
@@ -177,7 +179,10 @@ class TestConstr extends munit.FunSuite:
         val couplings = rs.collect:
           case Rel(e1, Requires, Model(Vector(e2: Ent))) => Var(e1.has/Order) === Var(e2.has/Order)
 
-        Seq(featureOrder, releaseOrder, weightedBenefit, featureBenefitSum, featureBenefitPerRelease, benefitPerRelease, featureCostPerReleasePerResource, resourceCostPerRelease, featureCostPerRelease, costPerRelease, costLimitPerResource, totalCostPerRelease, precedences, exclusions, couplings).flatten
+        val inputConstraints: Seq[Constr] = simple.paths.collect:
+          case AttrPath(links, dest: IntAttr) => Var(AttrTypePath(links, dest.t)) === dest.value  
+
+        Seq(inputConstraints, featureOrder, releaseOrder, weightedBenefit, featureBenefitSum, featureBenefitPerRelease, benefitPerRelease, featureCostPerReleasePerResource, resourceCostPerRelease, featureCostPerRelease, costPerRelease, costLimitPerResource, totalCostPerRelease, precedences, exclusions, couplings).flatten
 
     end constraints
 
@@ -191,12 +196,31 @@ class TestConstr extends munit.FunSuite:
 
     val solMap = solution.lastSolution
 
-    val pathValues = 
-      solMap.map{case (v, x) => v.id.asInstanceOf[AttrTypePath[Int]] -> x}
+    // extension [T](at: AttrTypePath[T]) 
+    //   def /(value: T): AttrPath[T] = AttrPath(at.links, at.dest.t.apply(value)) 
+
+    val paths = 
+      solMap.collect: 
+        case (v, x) => 
+          val at = v.id.asInstanceOf[AttrTypePath[Int]] 
+          val d: IntAttrType = at.dest.asInstanceOf[IntAttrType]
+          AttrPath(at.links, d.apply(x))
+      .toVector
+
 
     //println(s"    solution.conclusion: ${solution.conclusion}")
 
-    println(s"    pathValues:\n")
-    pathValues.foreach((v,x) => println(s"  ${v} \t\t=== $x"))
-    ???
+    println(s"    paths:\n")
+    paths.foreach(println)
+    val m: Model = paths.foldLeft(Model())(_ ++ _.toModel)
+    println("------------ SOLUTION")
+    println(m.sorted.showCompact)
+
+    val solReqT3 =  Model(Release("A").has(Feature("1").has(Benefit(0),Cost(0)),Feature("2").has(Benefit(0),Cost(0)),Feature("3").has(Benefit(3),Cost(110)),Resource("dev").has(Feature("1").has(Cost(0)),Feature("2").has(Cost(0)),Feature("3").has(Cost(40)),Cost(40)),Resource("test").has(Feature("1").has(Cost(0)),Feature("2").has(Cost(0)),Feature("3").has(Cost(70)),Cost(70)),Benefit(3),Cost(110),Order(1)),Release("B").has(Feature("1").has(Benefit(8),Cost(50)),Feature("2").has(Benefit(4),Cost(80)),Feature("3").has(Benefit(0),Cost(0)),Resource("dev").has(Feature("1").has(Cost(10)),Feature("2").has(Cost(70)),Feature("3").has(Cost(0)),Cost(80)),Resource("test").has(Feature("1").has(Cost(40)),Feature("2").has(Cost(10)),Feature("3").has(Cost(0)),Cost(50)),Benefit(12),Cost(130),Order(2)),Feature("1").has(Stakeholder("X").has(Benefit(4)),Stakeholder("Y").has(Benefit(4)),Benefit(8),Order(2)),Feature("2").has(Stakeholder("X").has(Benefit(2)),Stakeholder("Y").has(Benefit(2)),Benefit(4),Order(2)),Feature("3").has(Stakeholder("X").has(Benefit(1)),Stakeholder("Y").has(Benefit(2)),Benefit(3),Order(1)),Stakeholder("X").has(Feature("1").has(Benefit(4)),Feature("2").has(Benefit(2)),Feature("3").has(Benefit(1)),Prio(1)),Stakeholder("Y").has(Feature("1").has(Benefit(2)),Feature("2").has(Benefit(1)),Feature("3").has(Benefit(1)),Prio(2)),Resource("dev").has(Release("A").has(Capacity(100)),Release("B").has(Capacity(100)),Feature("1").has(Cost(10)),Feature("2").has(Cost(70)),Feature("3").has(Cost(40))),Resource("test").has(Release("A").has(Capacity(100)),Release("B").has(Capacity(100)),Feature("1").has(Cost(40)),Feature("2").has(Cost(10)),Feature("3").has(Cost(70))))
+
+    println("------------ OLD SOLUTION")
+    println(solReqT3.sorted.showCompact)
+
+    assert:
+      solReqT3.sorted == m.sorted
   
