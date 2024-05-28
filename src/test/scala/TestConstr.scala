@@ -113,7 +113,7 @@ class TestConstr extends munit.FunSuite:
       val requiredEntityTypes = List(Release, Feature, Stakeholder, Resource)
       val isRequiredEntityTypes = requiredEntityTypes.toSet
   
-      def missing(m: Model): Seq[EntType] = m.ents.map(_.t).filterNot(isRequiredEntityTypes)  // Should be e.t in next version of reqT-lang
+      def missing(m: Model): Seq[EntType] = m.ents.map(_.t).filterNot(isRequiredEntityTypes) 
       
       def isValid(m: Model): Boolean = missing(m).isEmpty
       
