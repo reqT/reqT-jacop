@@ -71,14 +71,14 @@ object jacop:
     def checkIfNameExists(name: String, vs: Seq[Var]): Boolean = 
       vs.exists { case v: Var => v.id.toString == name }
 
-    def flattenAllConstraints(cs: Seq[Constr]): Seq[Constr] =
-      def flatten(xs: Seq[Constr]): Seq[Constr] = 
-        if xs.isEmpty then xs 
-        else (xs.head match {
-          //case cs: Constraints => flatten(cs.value)  ???
-          case c => Seq(c)
-        } ) ++ flatten(xs.tail)
-      flatten(cs)
+    // def flattenAllConstraints(cs: Seq[Constr]): Seq[Constr] =
+    //   def flatten(xs: Seq[Constr]): Seq[Constr] = 
+    //     if xs.isEmpty then xs 
+    //     else (xs.head match {
+    //       //case cs: Constraints => flatten(cs.value)  ???
+    //       case c => Seq(c)
+    //     } ) ++ flatten(xs.tail)
+    //   flatten(cs)
     
     extension (vs: ValueSelection) def toJacop: jsearch.Indomain[JIntVar] = 
       import ValueSelection.*
@@ -184,8 +184,8 @@ object jacop:
     import JacopSolver.*
     import cfg.*
     
-    lazy val flatConstr = flattenAllConstraints(constraints)
-    lazy val domainOf: Map[Var, Seq[Range]] = buildDomainMap(flatConstr)
+    //lazy val flatConstr = flattenAllConstraints(constraints)
+    lazy val domainOf: Map[Var, Seq[Range]] = buildDomainMap(constraints) // flatConstr
 
     def buildDomainMap(cs: Seq[Constr]): Ivls =
       var result = collectBounds(cs).map(intervals(_)).foldLeft(Map(): Ivls)(mergeIntervals(_,_))
@@ -212,8 +212,8 @@ object jacop:
 
     def solve: Result = if constraints.size > 0 then
       val store = new jcore.Store
-      val vs = distinctVars(flatConstr)
-      val cs = collectConstr(flatConstr)
+      val vs = distinctVars(constraints)  // flatConstr
+      val cs = collectConstr(constraints) // flatConstr
       if verbose then println("*** VARIABLES:   " + vs.mkString(","))
       if verbose then println("*** CONSTRAINTS: " + cs.mkString(","))
       
