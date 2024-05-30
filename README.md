@@ -18,14 +18,9 @@
 ```
 * With reqT-lang, org.jacop and reqT-jacop on your class path you will get access to constraint satisfaction problem (csp) solving using extension methods such as `satisfy`, `findAll`, `maximise` etc., as exported [here](https://github.com/reqT/reqT-jacop/blob/main/src/main/scala/reqt-jacop.scala#L3).
 
-* Start REPL with `scala-cli repl .` 
-
-* Solve this simple constraint satisfaction problem example:
+* Start REPL with `scala-cli repl .` and solve this simple constraint satisfaction problem example:
 
 ```scala
-Welcome to Scala 3.3.3 (17.0.10, Java OpenJDK 64-Bit Server VM).
-Type in expressions for evaluation. Or try :help.
-
 scala> import reqt.*
 
 scala> val cs = Seq(Var("x") > Var("y"), Var("x") < 42, Var("y") > 0)
