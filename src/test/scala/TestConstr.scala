@@ -188,8 +188,8 @@ class TestConstr extends munit.FunSuite:
 
     val problem = constraints(simple)
 
-    //problem.foreach(c => println(s"  Constr:\n    $c"))
-    println(s"    problem has ${problem.length} constraints")
+    // problem.foreach(c => println(s"  Constr:\n    $c"))
+    // println(s"    problem has ${problem.length} constraints")
 
     //val solution = problem.maximize(Var(Release("A")/Benefit))
     val solution = problem.maximize(Var(Release("A").has/Benefit))
@@ -210,16 +210,16 @@ class TestConstr extends munit.FunSuite:
 
     //println(s"    solution.conclusion: ${solution.conclusion}")
 
-    println(s"    paths:\n")
-    paths.foreach(println)
+    // println(s"    paths:\n")
+    // paths.foreach(println)
     val m: Model = paths.foldLeft(Model())(_ ++ _.toModel)
-    println("------------ SOLUTION")
-    println(m.sorted.showCompact)
+    // println("------------ SOLUTION")
+    // println(m.sorted.showCompact)
 
     val solReqT3 =  Model(Release("A").has(Feature("1").has(Benefit(0),Cost(0)),Feature("2").has(Benefit(0),Cost(0)),Feature("3").has(Benefit(3),Cost(110)),Resource("dev").has(Feature("1").has(Cost(0)),Feature("2").has(Cost(0)),Feature("3").has(Cost(40)),Cost(40)),Resource("test").has(Feature("1").has(Cost(0)),Feature("2").has(Cost(0)),Feature("3").has(Cost(70)),Cost(70)),Benefit(3),Cost(110),Order(1)),Release("B").has(Feature("1").has(Benefit(8),Cost(50)),Feature("2").has(Benefit(4),Cost(80)),Feature("3").has(Benefit(0),Cost(0)),Resource("dev").has(Feature("1").has(Cost(10)),Feature("2").has(Cost(70)),Feature("3").has(Cost(0)),Cost(80)),Resource("test").has(Feature("1").has(Cost(40)),Feature("2").has(Cost(10)),Feature("3").has(Cost(0)),Cost(50)),Benefit(12),Cost(130),Order(2)),Feature("1").has(Stakeholder("X").has(Benefit(4)),Stakeholder("Y").has(Benefit(4)),Benefit(8),Order(2)),Feature("2").has(Stakeholder("X").has(Benefit(2)),Stakeholder("Y").has(Benefit(2)),Benefit(4),Order(2)),Feature("3").has(Stakeholder("X").has(Benefit(1)),Stakeholder("Y").has(Benefit(2)),Benefit(3),Order(1)),Stakeholder("X").has(Feature("1").has(Benefit(4)),Feature("2").has(Benefit(2)),Feature("3").has(Benefit(1)),Prio(1)),Stakeholder("Y").has(Feature("1").has(Benefit(2)),Feature("2").has(Benefit(1)),Feature("3").has(Benefit(1)),Prio(2)),Resource("dev").has(Release("A").has(Capacity(100)),Release("B").has(Capacity(100)),Feature("1").has(Cost(10)),Feature("2").has(Cost(70)),Feature("3").has(Cost(40))),Resource("test").has(Release("A").has(Capacity(100)),Release("B").has(Capacity(100)),Feature("1").has(Cost(40)),Feature("2").has(Cost(10)),Feature("3").has(Cost(70))))
 
-    println("------------ OLD SOLUTION")
-    println(solReqT3.sorted.showCompact)
+    // println("------------ OLD SOLUTION")
+    // println(solReqT3.sorted.showCompact)
 
     assert:
       solReqT3.sorted == m.sorted

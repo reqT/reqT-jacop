@@ -20,7 +20,7 @@
 
 * Start REPL with `scala-cli repl .` 
 
-* Test solving a simple constraint satisfaction problem:
+* Solve this simple constraint satisfaction problem example:
 
 ```scala
 Welcome to Scala 3.3.3 (17.0.10, Java OpenJDK 64-Bit Server VM).
