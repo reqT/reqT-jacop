@@ -247,8 +247,8 @@ object jacop:
             // searchAll is set after setting solutionLimit as explained by Kris
             listener.searchAll(searchAll)
             listener.recordSolutions(recordSolutions)
-            timeOutOption.map { timeOut => label.setTimeOut(timeOut) } 
-            solutionLimitOption.map { limit =>  listener.setSolutionLimit(limit) }
+            for timeOut <- timeOutOption do label.setTimeOut(timeOut) 
+            for limit <- solutionLimitOption do listener.setSolutionLimit(limit)
           
           val variablesToAssign: Array[JIntVar] = 
             if !assignOption.isDefined then collectIntVars(store) //assign all in store
