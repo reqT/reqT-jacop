@@ -108,6 +108,7 @@ class TestConstr extends munit.FunSuite:
       Feature("3") precedes Feature("1")
     ) 
 
+   // TODO: This should be replaced by reqt.csp.releasePlanningProblem.apply
     def constraints(m: Model): Seq[Constr] =  
         
       val requiredEntityTypes = List(Release, Feature, Stakeholder, Resource)
@@ -168,7 +169,7 @@ class TestConstr extends munit.FunSuite:
           case _: Node => Vector() 
           case r@Rel(_, _, m) => Vector(r) ++ rels(m)
         
-        val rs = simple.rels
+        val rs = m.rels
         
         val precedences = rs.collect:
           case Rel(e1, Precedes, Model(Vector(e2: Ent))) => Var(e1.has/Order) < Var(e2.has/Order) 
@@ -179,7 +180,7 @@ class TestConstr extends munit.FunSuite:
         val couplings = rs.collect:
           case Rel(e1, Requires, Model(Vector(e2: Ent))) => Var(e1.has/Order) === Var(e2.has/Order)
 
-        val inputConstraints: Seq[Constr] = simple.paths.collect:
+        val inputConstraints: Seq[Constr] = m.paths.collect:
           case AttrPath(links, dest: IntAttr) => Var(AttrTypePath(links, dest.t)) === dest.value  
 
         Seq(inputConstraints, featureOrder, releaseOrder, weightedBenefit, featureBenefitSum, featureBenefitPerRelease, benefitPerRelease, featureCostPerReleasePerResource, resourceCostPerRelease, featureCostPerRelease, costPerRelease, costLimitPerResource, totalCostPerRelease, precedences, exclusions, couplings).flatten
