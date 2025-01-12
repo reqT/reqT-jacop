@@ -50,7 +50,3 @@ val n: Int = 820
 * Bump the version in `package.sh` and run the script.
 
 * Create a release and upload the jar to the release section of this GitHub repo.
-
-# License
-
-The code in this repo has a permissive license, but note that the `jacop` dependency has a non-permissive license. 
