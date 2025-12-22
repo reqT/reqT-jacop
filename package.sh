@@ -1,7 +1,7 @@
-VER="1.1.1"
+VER="1.1.2"
 scala-cli clean .
 scala-cli test .
-scala-cli package . --library -o ".scala-build/reqt-jacop_3-$VER.jar"
+scala-cli package . --power --library -o ".scala-build/reqt-jacop_3-$VER.jar"
 
 echo "run in terminal to upload release using github cli:"
 
